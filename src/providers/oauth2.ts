@@ -1,10 +1,10 @@
-import type { ServerRequest } from "@sveltejs/kit/types/endpoint";
+import { ServerRequest } from '@sveltejs/kit/types/hooks';
 import type { Auth } from "../auth";
 import { ucFirst } from "../helpers";
 import { OAuth2BaseProvider, OAuth2BaseProviderConfig, OAuth2Tokens } from "./oauth2.base";
 
 export interface OAuth2ProviderConfig<ProfileType = any, TokensType extends OAuth2Tokens = any>
-  extends OAuth2BaseProviderConfig<ProfileType, TokensType> {
+    extends OAuth2BaseProviderConfig<ProfileType, TokensType> {
   accessTokenUrl?: string;
   authorizationUrl?: string;
   profileUrl?: string;
@@ -26,10 +26,10 @@ const defaultConfig: Partial<OAuth2ProviderConfig> = {
 };
 
 export class OAuth2Provider<
-  ProfileType = any,
-  TokensType extends OAuth2Tokens = OAuth2Tokens,
-  ConfigType extends OAuth2ProviderConfig = OAuth2ProviderConfig<ProfileType, TokensType>,
-> extends OAuth2BaseProvider<ProfileType, TokensType, ConfigType> {
+    ProfileType = any,
+    TokensType extends OAuth2Tokens = OAuth2Tokens,
+    ConfigType extends OAuth2ProviderConfig = OAuth2ProviderConfig<ProfileType, TokensType>,
+    > extends OAuth2BaseProvider<ProfileType, TokensType, ConfigType> {
   constructor(config: ConfigType) {
     super({
       ...defaultConfig,
@@ -37,19 +37,19 @@ export class OAuth2Provider<
     });
   }
 
-  getAuthorizationUrl({ host }: ServerRequest, auth: Auth, state: string, nonce: string) {
+  getAuthorizationUrl({ url }: ServerRequest, auth: Auth, state: string, nonce: string) {
     const data = {
       state,
       nonce,
       response_type: this.config.responseType,
       client_id: this.config.clientId,
       scope: Array.isArray(this.config.scope) ? this.config.scope.join(" ") : this.config.scope!,
-      redirect_uri: this.getCallbackUri(auth, host),
+      redirect_uri: this.getCallbackUri(auth, url.host),
       ...(this.config.authorizationParams ?? {}),
     };
 
-    const url = `${this.config.authorizationUrl}?${new URLSearchParams(data)}`;
-    return url;
+    const authUrl = `${this.config.authorizationUrl}?${new URLSearchParams(data)}`;
+    return authUrl;
   }
 
   async getTokens(code: string, redirectUri: string): Promise<TokensType> {
@@ -65,8 +65,8 @@ export class OAuth2Provider<
     let body: string;
     if (this.config.contentType === "application/x-www-form-urlencoded") {
       body = Object.entries(data)
-        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-        .join("&");
+          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+          .join("&");
     } else {
       body = JSON.stringify(data);
     }
