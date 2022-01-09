@@ -18,13 +18,13 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c --watch",
+    "build": "rollup --config",
+    "dev": "rollup --config --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
-    "build:component": "mkdir dist; rollup -c rollup.config.js",
-    "prepare": "npm run build:component"
+    "build:component": "rollup -c rollup.config.js",
+    "prepare": "yarn build:component || npm run build:component"
   },
   "keywords": [
     "auth",
