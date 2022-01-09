@@ -24,7 +24,7 @@
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
     "build:component": "mkdir dist; rollup -c rollup.config.js",
-    "prepare": "pnpm run build:component || yarn build:component || npm run build:component"
+    "prepare": "npm run build:component"
   },
   "keywords": [
     "auth",
